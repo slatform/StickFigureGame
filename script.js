@@ -4,46 +4,54 @@ const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-let player = { x: 100, y: canvas.height - 150, width: 50, height: 100, dy: 0, isJumping: false, isDucking: false };
+let player = {
+  x: 100,
+  y: canvas.height - 150,
+  width: 50,
+  height: 100,
+  dy: 0,
+  isJumping: false,
+};
 let obstacles = [];
-let backgroundX = 0;
 let gameSpeed = 5;
 let gravity = 0.8;
 let score = 0;
 let isGameOver = false;
 
+// Adjusted maximum jump height
+const maxJumpHeight = -15;
+
 // Draw the stick figure
 function drawPlayer() {
   ctx.fillStyle = 'black';
-  if (player.isDucking) {
-    ctx.fillRect(player.x, player.y + 50, player.width, player.height / 2); // Duck position
-  } else {
-    ctx.fillRect(player.x, player.y, player.width, player.height); // Normal position
-  }
+  ctx.fillRect(player.x, player.y, player.width, player.height);
 }
 
 // Update the player's position
 function updatePlayer() {
   player.y += player.dy;
 
+  // Apply gravity
   if (player.y + player.height < canvas.height) {
-    player.dy += gravity; // Apply gravity
+    player.dy += gravity;
   } else {
-    player.y = canvas.height - player.height; // Stay on the ground
+    // Reset to the ground
+    player.y = canvas.height - player.height;
     player.dy = 0;
     player.isJumping = false;
   }
 }
 
-// Create obstacles with varying heights and speeds
+// Create ground obstacles
 function createObstacle() {
-  let height = Math.random() * 150 + 50;
+  const width = Math.random() * 50 + 30; // Random width between 30 and 80
+  const height = Math.random() * 30 + 30; // Random height between 30 and 60
   obstacles.push({
     x: canvas.width,
-    y: canvas.height - height,
-    width: Math.random() * 50 + 50,
+    y: canvas.height - height, // Place obstacles on the ground
+    width,
     height,
-    speed: gameSpeed + Math.random() * 3,
+    speed: gameSpeed + Math.random() * 2, // Vary obstacle speed slightly
   });
 }
 
@@ -77,12 +85,12 @@ function updateObstacles() {
   });
 }
 
-// Background scrolling
+// Background and ground
 function drawBackground() {
-  ctx.fillStyle = '#add8e6';
+  ctx.fillStyle = '#add8e6'; // Light blue background
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = '#228B22';
-  ctx.fillRect(0, canvas.height - 20, canvas.width, 20); // Ground
+  ctx.fillStyle = '#228B22'; // Green ground
+  ctx.fillRect(0, canvas.height - 20, canvas.width, 20);
 }
 
 // Game loop
@@ -107,21 +115,14 @@ function gameLoop() {
 
 // Controls
 document.addEventListener('keydown', (event) => {
-  if (event.code === 'Space' && !player.isJumping) {
-    player.dy = -15; // Jump force
+  if (event.code === 'Space') {
+    if (player.y + player.height === canvas.height || player.dy < maxJumpHeight) {
+      player.dy = maxJumpHeight; // Apply jump force on every press
+    }
     player.isJumping = true;
-  }
-  if (event.code === 'ArrowDown') {
-    player.isDucking = true; // Duck
   }
   if (event.code === 'KeyR' && isGameOver) {
     location.reload(); // Restart the game
-  }
-});
-
-document.addEventListener('keyup', (event) => {
-  if (event.code === 'ArrowDown') {
-    player.isDucking = false; // Stop ducking
   }
 });
 
