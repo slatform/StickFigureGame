@@ -1,0 +1,11 @@
+body {
+    margin: 0;
+    overflow: hidden;
+    background-color: #000; /* Black for black-and-white theme */
+  }
+  
+  canvas {
+    display: block;
+    background: linear-gradient(to bottom, #000, #555); /* Optional gradient */
+  }
+  
